@@ -41,18 +41,55 @@ export default function ProjectDetail({ projects, updateProject, deleteProject }
     updateProject(id, { ...project, notes });
   };
 
-  const handleFileUploadMock = () => {
-    const defaultName = `topology_v${project.files.length + 1}.pkt`;
-    const newFile = {
-      id: Date.now().toString(),
-      name: defaultName,
-      size: (Math.random() * 5).toFixed(1) + ' MB'
+  const handleRealFileUpload = (e) => {
+    const fileList = e.target.files;
+    if (!fileList || fileList.length === 0) return;
+
+    const file = fileList[0];
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const newFile = {
+        id: Date.now().toString(),
+        name: file.name,
+        size: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+        dataUri: event.target.result
+      };
+      
+      updateProject(id, {
+        ...project,
+        files: [...project.files, newFile],
+        fileCount: project.fileCount + 1
+      });
     };
-    updateProject(id, {
-      ...project,
-      files: [...project.files, newFile],
-      fileCount: project.fileCount + 1
-    });
+
+    reader.readAsDataURL(file);
+    e.target.value = null;
+  };
+
+  const handleDownloadFile = (fileObj) => {
+    if (!fileObj.dataUri) {
+      alert("This is a placeholder file. Upload a new file from your PC to download it!");
+      return;
+    }
+    const link = document.createElement('a');
+    link.href = fileObj.dataUri;
+    link.download = fileObj.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleDownloadProject = () => {
+    // Strip dataUris to keep the file clean, or keep them if we want a full backup
+    const exportData = { ...project };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+    const link = document.createElement('a');
+    link.href = dataStr;
+    link.download = `${project.title.replace(/\s+/g, '_')}_architecture.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleDeleteFile = (fileId) => {
@@ -77,6 +114,14 @@ export default function ProjectDetail({ projects, updateProject, deleteProject }
             title="Edit Project Details"
           >
             <Edit2 size={14} /> Edit
+          </button>
+          <button 
+            className="glow-btn" 
+            style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', color: 'var(--accent-cyan)' }}
+            onClick={handleDownloadProject}
+            title="Export Project Backup"
+          >
+            <Download size={14} /> Export Backup
           </button>
           <button 
             className="glow-btn" 
@@ -156,9 +201,17 @@ export default function ProjectDetail({ projects, updateProject, deleteProject }
           <div className="detail-section">
             <div className="section-header">
               <h2 className="section-title">Attached Files</h2>
-              <button className="glow-btn success" onClick={handleFileUploadMock} style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }}>
-                <Upload size={14} /> Upload
-              </button>
+              <label 
+                className="glow-btn success" 
+                style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', cursor: 'pointer', margin: 0 }}
+              >
+                <Upload size={14} /> Upload File
+                <input 
+                  type="file" 
+                  style={{ display: 'none' }} 
+                  onChange={handleRealFileUpload} 
+                />
+              </label>
             </div>
             
             {project.files.map(file => (
@@ -169,7 +222,7 @@ export default function ProjectDetail({ projects, updateProject, deleteProject }
                 </div>
                 <div className="file-actions">
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{file.size}</span>
-                  <button className="copy-btn"><Download size={14} /></button>
+                  <button className="copy-btn" onClick={() => handleDownloadFile(file)} title="Download Attached File"><Download size={14} /></button>
                   <button className="copy-btn" style={{ color: '#e74c3c' }} onClick={() => handleDeleteFile(file.id)} title="Delete Attached File"><Trash2 size={14} /></button>
                 </div>
               </div>
