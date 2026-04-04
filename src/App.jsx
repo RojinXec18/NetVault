@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation, Navigate, useNavigate } from 'react-router-dom';
-import { Terminal, Folder, Settings, Search, Plus, Server, LogOut, Users, BookOpen } from 'lucide-react';
+import { Terminal, Folder, Settings, Search, Plus, Server, LogOut, Users, BookOpen, Activity } from 'lucide-react';
 import Dashboard from './Dashboard';
 import ProjectDetail from './ProjectDetail';
 import NewProjectModal from './NewProjectModal';
@@ -11,6 +11,7 @@ import Topologies from './Topologies';
 import SettingsPage from './Settings';
 import Learning from './Learning';
 import ChatBot from './ChatBot';
+import Workspace from './Workspace';
 import './App.css';
 
 const defaultProjects = [
@@ -109,6 +110,10 @@ function App() {
             <Server size={18} />
             Topologies
           </Link>
+          <Link to="/workspace" className={`nav-item ${location.pathname === '/workspace' ? 'active' : ''}`}>
+            <Activity size={18} />
+            Workspace Canvas
+          </Link>
           <Link to="/learning" className={`nav-item ${location.pathname === '/learning' ? 'active' : ''}`}>
             <BookOpen size={18} />
             Learning Hub
@@ -153,6 +158,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard projects={projects} searchTerm={searchTerm} />} />
             <Route path="/community" element={<Community />} />
             <Route path="/topologies" element={<Topologies />} />
+            <Route path="/workspace" element={<Workspace />} />
             <Route path="/learning" element={<Learning />} />
             <Route path="/settings" element={<SettingsPage user={user} logout={logout} />} />
             <Route path="/project/:id" element={<ProjectDetail projects={projects} updateProject={updateProject} deleteProject={deleteProject} />} />

@@ -5,10 +5,23 @@ import { Network, FileText, Clock, User, Activity, Star } from 'lucide-react';
 export default function Dashboard({ projects, searchTerm }) {
   const [bio, setBio] = useState(() => localStorage.getItem('netvault_user_bio') || "I'm currently brushing up on my BGP fundamentals and setting up a new virtual lab environment for testing route reflectors.");
   const [isEditingBio, setIsEditingBio] = useState(false);
+  const [profileImage, setProfileImage] = useState(() => localStorage.getItem('netvault_profile_img') || null);
 
   useEffect(() => {
     localStorage.setItem('netvault_user_bio', bio);
   }, [bio]);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImage(reader.result);
+        localStorage.setItem('netvault_profile_img', reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const filteredProjects = projects.filter(p => 
     p.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -22,12 +35,18 @@ export default function Dashboard({ projects, searchTerm }) {
       </div>
 
       {/* User Profile / Status Header */}
-      <div className="detail-section" style={{ display: 'flex', gap: '2rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '2rem' }}>
+      <div className="detail-section" style={{ display: 'flex', gap: '2rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '2rem', background: 'linear-gradient(135deg, var(--bg-dark), rgba(0, 240, 255, 0.05))', borderRadius: '12px', padding: '1.5rem' }}>
         
         {/* User Visuals */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', borderRight: '1px solid var(--border-color)', paddingRight: '2rem' }}>
-          <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--bg-dark)', border: '2px solid var(--accent-cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 15px rgba(0,255,255,0.2)' }}>
-            <User size={40} style={{ color: 'var(--text-primary)' }} />
+          <div style={{ width: '90px', height: '90px', borderRadius: '50%', background: 'var(--bg-dark)', border: '2px solid var(--accent-cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 15px rgba(0,255,255,0.2)', overflow: 'hidden', position: 'relative', transition: 'all 0.3s' }} className="avatar-container">
+            {profileImage ? (
+              <img src={profileImage} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <User size={40} style={{ color: 'var(--text-primary)' }} />
+            )}
+            <input type="file" accept="image/*" onChange={handleImageUpload} style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }} title="Upload Profile Picture" />
+            <div className="avatar-overlay" style={{ position: 'absolute', bottom: 0, width: '100%', background: 'rgba(0,0,0,0.6)', color: 'white', fontSize: '0.6rem', textAlign: 'center', padding: '2px 0', pointerEvents: 'none', opacity: 0, transition: 'opacity 0.2s' }}>Upload</div>
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontWeight: '600', fontSize: '1.1rem', color: 'var(--accent-cyan)' }}>Administrator</div>
@@ -63,14 +82,14 @@ export default function Dashboard({ projects, searchTerm }) {
             {!isEditingBio ? (
               <button 
                 onClick={() => setIsEditingBio(true)} 
-                style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', cursor: 'pointer', fontSize: '0.8rem' }}
+                style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', cursor: 'pointer', fontSize: '0.8rem', textDecoration: 'underline' }}
               >
-                Edit Bio
+                Edit Focus
               </button>
             ) : (
               <button 
                 onClick={() => setIsEditingBio(false)} 
-                style={{ background: 'none', border: 'none', color: 'var(--accent-green)', cursor: 'pointer', fontSize: '0.8rem' }}
+                style={{ background: 'none', border: 'none', color: 'var(--accent-green)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}
               >
                 Save
               </button>
@@ -81,11 +100,11 @@ export default function Dashboard({ projects, searchTerm }) {
             <textarea 
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              style={{ width: '100%', minHeight: '60px', borderRadius: '4px', background: 'var(--bg-dark)' }}
+              style={{ width: '100%', minHeight: '60px', borderRadius: '4px', background: 'var(--bg-dark)', padding: '0.5rem', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
               autoFocus
             />
           ) : (
-            <div style={{ color: 'var(--text-primary)', lineHeight: '1.5', fontStyle: 'italic', background: 'rgba(0,0,0,0.2)', padding: '0.75rem', borderRadius: '8px', borderLeft: '2px solid var(--accent-cyan)' }}>
+            <div style={{ color: 'var(--text-primary)', lineHeight: '1.5', fontStyle: 'italic', background: 'rgba(0,0,0,0.2)', padding: '0.75rem', borderRadius: '8px', borderLeft: '3px solid var(--accent-cyan)' }}>
               "{bio}"
             </div>
           )}
@@ -127,7 +146,9 @@ export default function Dashboard({ projects, searchTerm }) {
           </Link>
         ))}
         {filteredProjects.length === 0 && (
-          <div style={{ color: 'var(--text-muted)' }}>No projects found matching your search.</div>
+          <div style={{ color: 'var(--text-muted)', padding: '2rem', textAlign: 'center', background: 'var(--bg-dark)', borderRadius: '8px' }}>
+            No projects found matching your search.
+          </div>
         )}
       </div>
     </>
