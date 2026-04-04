@@ -1,75 +1,43 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Terminal, Smartphone, Lock, ShieldCheck } from 'lucide-react';
+import { Terminal, ShieldCheck } from 'lucide-react';
 
 export default function Login({ login }) {
-  const [step, setStep] = useState(1); // 1: Initial, 2: Phone Entry, 3: OTP Entry, 4: Success
+  const [step, setStep] = useState(1); // 1: Initial Google Auth, 2: Success Redirection
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleGoogleLogin = () => {
     setIsLoading(true);
-    // Simulate OAuth redirect and return
+    // Simulate OAuth redirect and verification via Google 2FA internally
     setTimeout(() => {
-      setEmail('developer@gmail.com'); // Mocked returning email
+      const authEmail = 'developer@gmail.com';
+      setEmail(authEmail);
+      setIsLoading(false);
       setStep(2);
-      setIsLoading(false);
-    }, 1500);
-  };
-
-  const handlePhoneSubmit = (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    // Simulate sending OTP
-    setTimeout(() => {
-      setStep(3);
-      setIsLoading(false);
-    }, 1000);
-  };
-
-  const handleOtpChange = (index, value) => {
-    if (value.length > 1) value = value.slice(0, 1);
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-    // Auto-focus next input
-    if (value && index < 5) {
-      document.getElementById(`otp-${index + 1}`).focus();
-    }
-  };
-
-  const handleOtpSubmit = (e) => {
-    e.preventDefault();
-    const code = otp.join('');
-    if (code.length === 6) {
-      setIsLoading(true);
-      // Simulate verification
+      
+      // Complete login
       setTimeout(() => {
-        setStep(4);
-        setTimeout(() => {
-          login({ 
-            email: email, 
-            phone: phone,
-            name: email.split('@')[0],
-            avatar: null, // to be uploaded later
-            bio: '',
-            isPrivate: false,
-            projectsPrivate: false
-          });
-          navigate('/dashboard');
-        }, 1500);
-      }, 1000);
-    }
+        login({ 
+          email: authEmail, 
+          phone: '',
+          name: authEmail.split('@')[0],
+          avatar: null,
+          bio: '',
+          isPrivate: false,
+          projectsPrivate: false
+        });
+        navigate('/dashboard');
+      }, 1500);
+    }, 1500);
   };
 
   return (
     <div style={{ display: 'flex', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--bg-dark)' }}>
       <div className="card" style={{ width: '100%', maxWidth: '400px', padding: '2.5rem', position: 'relative', overflow: 'hidden' }}>
         {/* Progress bar line top */}
-        <div style={{ position: 'absolute', top: 0, left: 0, height: '4px', background: 'var(--accent-cyan)', width: `${(step / 4) * 100}%`, transition: 'width 0.3s ease' }}></div>
+        <div style={{ position: 'absolute', top: 0, left: 0, height: '4px', background: 'var(--accent-cyan)', width: `${(step / 2) * 100}%`, transition: 'width 0.3s ease' }}></div>
 
         {step === 1 && (
           <div className="fade-in">
@@ -87,7 +55,7 @@ export default function Login({ login }) {
               style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '1rem', padding: '1rem', background: 'var(--bg-lighter)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', cursor: 'pointer' }}
             >
               {isLoading ? (
-                <span className="pulsing">Connecting to Provider...</span>
+                <span className="pulsing">2FA Verifying via Google...</span>
               ) : (
                 <>
                   <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '10px' }}>
@@ -107,76 +75,10 @@ export default function Login({ login }) {
         )}
 
         {step === 2 && (
-          <div className="fade-in">
-            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-              <Smartphone size={40} style={{ color: 'var(--accent-cyan)', marginBottom: '1rem' }} />
-              <h3 style={{ color: 'var(--text-primary)' }}>Verify Identity</h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                For enhanced security, please link your phone number to <strong>{email}</strong>.
-              </p>
-            </div>
-            <form onSubmit={handlePhoneSubmit}>
-              <div className="form-group">
-                <label>Phone Number</label>
-                <input 
-                  type="tel" 
-                  required 
-                  value={phone}
-                  onChange={e => setPhone(e.target.value)}
-                  placeholder="+1 (555) 000-0000" 
-                  style={{ fontSize: '1.1rem', letterSpacing: '1px' }}
-                />
-              </div>
-              <button type="submit" disabled={isLoading} className="glow-btn success" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem', cursor: 'pointer' }}>
-                {isLoading ? 'Sending SMS...' : 'Send OTP Code'}
-              </button>
-            </form>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="fade-in">
-            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-              <Lock size={40} style={{ color: 'var(--accent-cyan)', marginBottom: '1rem' }} />
-              <h3 style={{ color: 'var(--text-primary)' }}>Enter OTP</h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                We sent a 6-digit code to <strong>{phone}</strong>.
-              </p>
-            </div>
-            <form onSubmit={handleOtpSubmit}>
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', margin: '2rem 0' }}>
-                {otp.map((digit, i) => (
-                  <input
-                    key={i}
-                    id={`otp-${i}`}
-                    type="text"
-                    value={digit}
-                    onChange={(e) => handleOtpChange(i, e.target.value)}
-                    style={{ 
-                      width: '40px', height: '50px', textAlign: 'center', fontSize: '1.5rem',
-                      background: 'var(--bg-dark)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '8px'
-                    }}
-                    maxLength={1}
-                  />
-                ))}
-              </div>
-              <button type="submit" disabled={isLoading || otp.join('').length < 6} className="glow-btn success" style={{ width: '100%', justifyContent: 'center', cursor: 'pointer' }}>
-                {isLoading ? 'Verifying...' : 'Verify & Login'}
-              </button>
-            </form>
-            <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-              <button type="button" onClick={() => setStep(2)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', textDecoration: 'underline', fontSize: '0.85rem' }}>
-                Change Phone Number
-              </button>
-            </div>
-          </div>
-        )}
-
-        {step === 4 && (
           <div className="fade-in" style={{ textAlign: 'center', padding: '2rem 0' }}>
             <ShieldCheck size={64} style={{ color: '#4caf50', marginBottom: '1rem', animation: 'pulse 2s infinite' }} />
-            <h2 style={{ color: 'var(--text-primary)' }}>Verification Successful</h2>
-            <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem' }}>Redirecting to your secure dashboard...</p>
+            <h2 style={{ color: 'var(--text-primary)' }}>Google 2FA Successful</h2>
+            <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem' }}>Welcome back, {email.split('@')[0]}! Redirecting to dashboard...</p>
           </div>
         )}
       </div>
