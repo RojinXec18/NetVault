@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Network, CheckCircle, Search, ExternalLink, Users, Activity } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const mockCommunityProjects = [
   { id: 'c1', title: 'Global ISP Backbone', author: 'Anna N.', tags: ['BGP', 'MPLS'], desc: 'Scaling BGP across 4 continents using Route Reflectors. Currently highly available and load balanced.', online: true },
@@ -12,6 +13,7 @@ export default function Community() {
   const [collabModalOpen, setCollabModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [requestSent, setRequestSent] = useState(false);
+  const navigate = useNavigate();
 
   const openCollabModal = (proj) => {
     setSelectedProject(proj);
@@ -76,7 +78,7 @@ export default function Community() {
               <button 
                 className="glow-btn" 
                 style={{ flex: 1, justifyContent: 'center', background: 'var(--bg-lighter)', color: 'var(--text-primary)' }} 
-                onClick={() => alert(`Opening preview for ${proj.title}...`)}
+                onClick={() => navigate('/workspace?preview=true')}
               >
                 <ExternalLink size={16} /> View Online
               </button>

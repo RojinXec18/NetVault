@@ -8,9 +8,10 @@ const beginnerTopologies = [
 ];
 
 const mockTopologies = [
-  { id: '1', name: 'Core Redundancy Map', ext: 'Visio', size: '2.1 MB', desc: 'High availability Enterprise core layer mapping with HSRP/VRRP.', color: '#9b59b6' },
-  { id: '2', name: 'Data Center Leaf-Spine', ext: 'PDF', size: '5.4 MB', desc: 'Modern Data Center architecture featuring VXLAN routing.', color: '#3498db' },
-  { id: '3', name: 'Standard Branch Deployment', ext: 'LucidChart', size: '1.2 MB', desc: 'SD-WAN edge devices with local breakout policies.', color: '#f1c40f' }
+  { id: '1', name: 'Core Redundancy Map', ext: 'Visio', size: '2.1 MB', desc: 'High availability Enterprise core layer mapping with HSRP/VRRP protocols active.', color: '#9b59b6' },
+  { id: '2', name: 'Data Center Leaf-Spine', ext: 'PDF', size: '5.4 MB', desc: 'Modern Data Center architecture featuring VXLAN routing, EVPN control plane, and multipath fabric.', color: '#3498db' },
+  { id: '3', name: 'Software-Defined Branch', ext: 'LucidChart', size: '1.2 MB', desc: 'SD-WAN edge devices with application-aware routing, IPSec overlays, and local breakout policies.', color: '#f1c40f' },
+  { id: '4', name: 'Global BGP & MPLS Backbone', ext: 'Packet Tracer', size: '6.8 MB', desc: 'Expert CCIE-level service provider core. Featuring eBGP peering, OSPF underlay, and VRF-lite segmentation.', color: '#e74c3c' }
 ];
 
 export default function Topologies() {

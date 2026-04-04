@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Copy, Upload, Download, CheckCircle, File as FileIcon, Trash2, Edit2 } from 'lucide-react';
+import { ArrowLeft, Plus, Copy, Upload, Download, CheckCircle, File as FileIcon, Trash2, Edit2, Globe, Lock } from 'lucide-react';
 import EditProjectModal from './EditProjectModal';
 
 export default function ProjectDetail({ projects, updateProject, deleteProject }) {
@@ -102,6 +102,11 @@ export default function ProjectDetail({ projects, updateProject, deleteProject }
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <Link to="/" style={{ color: 'var(--text-muted)' }}><ArrowLeft size={24} /></Link>
           <h1 className="page-title" style={{ margin: 0 }}>{project.title}</h1>
+          {project.isPublic ? (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.3rem 0.6rem', border: '1px solid var(--accent-green)', background: 'rgba(0, 255, 0, 0.1)', color: 'var(--accent-green)', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 'bold' }}><Globe size={14} /> Public</span>
+          ) : (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.3rem 0.6rem', border: '1px solid var(--accent-cyan)', background: 'rgba(0, 240, 255, 0.1)', color: 'var(--accent-cyan)', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 'bold' }}><Lock size={14} /> Private Vault</span>
+          )}
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <div className="tags-row" style={{ margin: 0 }}>

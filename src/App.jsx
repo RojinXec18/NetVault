@@ -24,7 +24,7 @@ const defaultProjects = [
 
 function App() {
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('netvault_user');
+    const saved = sessionStorage.getItem('netvault_user');
     return saved ? JSON.parse(saved) : null;
   });
 
@@ -45,9 +45,9 @@ function App() {
 
   useEffect(() => {
     if (user) {
-      localStorage.setItem('netvault_user', JSON.stringify(user));
+      sessionStorage.setItem('netvault_user', JSON.stringify(user));
     } else {
-      localStorage.removeItem('netvault_user');
+      sessionStorage.removeItem('netvault_user');
     }
   }, [user]);
 
@@ -93,7 +93,7 @@ function App() {
       
       {/* Sidebar */}
       <aside className="sidebar">
-        <div className="sidebar-header" onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
+        <div className="sidebar-header" onClick={logout} style={{ cursor: 'pointer' }} title="Logout & Return Home">
           <Terminal size={24} className="brand-icon" />
           <span className="brand-title">NetVault</span>
         </div>

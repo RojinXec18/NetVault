@@ -14,12 +14,30 @@ export default function Dashboard({ projects, searchTerm }) {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImage(reader.result);
-        localStorage.setItem('netvault_profile_img', reader.result);
+      const MAX_SIZE = 400; // max dimension
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > MAX_SIZE) { height = Math.round(height *= MAX_SIZE / width); width = MAX_SIZE; }
+        } else {
+          if (height > MAX_SIZE) { width = Math.round(width *= MAX_SIZE / height); height = MAX_SIZE; }
+        }
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85); // Compress to 85% JPEG
+        setProfileImage(dataUrl);
+        try {
+          localStorage.setItem('netvault_profile_img', dataUrl);
+        } catch (err) {
+          alert('Failed to save profile picture: Image too large, or browser storage is full.');
+        }
       };
-      reader.readAsDataURL(file);
+      img.src = url;
     }
   };
 
